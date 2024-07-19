@@ -1,4 +1,4 @@
-use crate::{verlet,scenario, GRAVITY,MAX_PARTICLES};
+use crate::{verlet,scenario, GRAVITY,MAX_PARTICLES,SUB_TICK};
 use nannou::prelude::*;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -87,11 +87,11 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
     }
     scenario::drizzle(model, update);
     
-    for _ in 0..10 {
+    for _ in 0..SUB_TICK {
         model.objects.iter_mut().for_each(|object| {
             object.apply_force(Vec2::new(0.0, GRAVITY));
             object.check_bounds();
-            object.update(update.since_last.as_secs_f32()/10.0);
+            object.update(0.1/SUB_TICK as f32);
         });
         
         verlet::VerletObject::check_collisions(&mut model.objects);

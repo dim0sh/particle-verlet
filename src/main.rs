@@ -16,6 +16,8 @@ pub const MAX_ACC: f32 = 100.0;
 
 pub const DAMPING: f32 = 1.1;
 
+pub const SUB_TICK: usize = 10;
+
 fn main() {
     nannou::app(model)
         .update(update)
