@@ -1,4 +1,4 @@
-use crate::{verlet,scenario, GRAVITY,MAX_PARTICLES,SUB_TICK};
+use crate::{scenario, verlet::{self, VerletObject}, GRAVITY, MAX_PARTICLES, SUB_TICK};
 use nannou::prelude::*;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -19,7 +19,9 @@ impl State {
 }
 
 pub struct Model {
+    pub initial: bool,
     pub objects: Vec<verlet::VerletObject>,
+    pub env_objects: Vec<verlet::VerletObject>,
     state: State,
     pub timer: f32,
     pub spawn_switch: f32,
@@ -45,7 +47,9 @@ pub fn model(app: &App) -> Model {
     .unwrap();
     
     Model {
+        initial: true,
         objects: Vec::new(),
+        env_objects: Vec::new(),
         state: State::Paused,
         timer: 0.0,
         spawn_switch: 0.0,
@@ -57,9 +61,17 @@ fn view(app: &App, model: &Model, frame: Frame) {
     draw.background().color(BLACK);
     model.objects.iter().for_each(|object| {
         draw.ellipse()
+            .resolution(8.0)
             .x_y(object.current.x, object.current.y)
             .radius(object.radius)
             .color(WHITE);
+    });
+    model.env_objects.iter().for_each(|object| {
+        draw.ellipse()
+            .resolution(8.0)
+            .x_y(object.current.x, object.current.y)
+            .radius(object.radius)
+            .color(RED);
     });
     draw.to_frame(app, &frame).unwrap();
 }
@@ -85,8 +97,9 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
         model.objects = Vec::new();
         model.state = State::Paused;
     }
-    scenario::drizzle(model, update);
-    
+    // scenario::drizzle(model, update);
+    scenario::env_drizzle(model, update);
+    model.initial = false;
     for _ in 0..SUB_TICK {
         model.objects.iter_mut().for_each(|object| {
             object.apply_force(Vec2::new(0.0, GRAVITY));
@@ -95,5 +108,6 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
         });
         
         verlet::VerletObject::check_collisions(&mut model.objects);
+        verlet::VerletObject::check_env_collision(&mut model.objects, &mut model.env_objects);
     }
 }

@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Sub};
+use std::{env, ops::{Add, Mul, Sub}};
 
 use nannou::prelude::*;
 
@@ -62,10 +62,30 @@ impl VerletObject {
         }
     }
 
+    pub fn handle_env_collision(objects: &mut Vec<VerletObject>,env_objects: &mut Vec<VerletObject>,i: usize, j: usize) {
+        let axis = Vec2::sub(objects[i].current, env_objects[j].current);
+        let dist = Vec2::length(axis);
+        let min_dist = objects[i].radius + env_objects[j].radius;
+        if dist < min_dist {
+            let norm = Vec2::normalize(axis);
+            let delta = objects[i].radius + env_objects[j].radius - dist;
+            let norm = Vec2::mul(norm, delta/2.0);
+            objects[i].current = Vec2::add(objects[i].current, norm);
+        }
+    }
+
     pub fn check_collisions(objects: &mut Vec<VerletObject>) {
         for i in 0..objects.len() {
             for j in i+1..objects.len() {
                 VerletObject::handle_collision(objects, i, j);
+            }
+        }
+    }
+
+    pub fn check_env_collision(objects: &mut Vec<VerletObject>, env_objects: &mut Vec<VerletObject>) {
+        for i in 0..objects.len() {
+            for j in 0.. env_objects.len() {
+                VerletObject::handle_env_collision(objects,env_objects,i,j);
             }
         }
     }
