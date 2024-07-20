@@ -1,5 +1,6 @@
 use crate::{scenario, verlet::{self, VerletObject}, GRAVITY, MAX_PARTICLES, SUB_TICK};
 use nannou::prelude::*;
+use window::MouseMovedFn;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum State {
@@ -23,6 +24,8 @@ impl State {
 pub struct Model {
     repel: bool,
     attract: bool,
+    direction: Vec2,
+    mouse_pos: Point2,
     pub objects: Vec<verlet::VerletObject>,
     pub env_objects: Vec<verlet::VerletObject>,
     pub state: State,
@@ -34,6 +37,7 @@ pub fn model(app: &App) -> Model {
     app.new_window()
     .size(800,800)
     .event(window_event)
+    .mouse_moved(mouse_moved)
     .view(view)
     .build()
     .unwrap();
@@ -41,6 +45,8 @@ pub fn model(app: &App) -> Model {
     Model {
         repel: false,
         attract: false,
+        direction: Vec2::new(1.0,1.0),
+        mouse_pos: Point2::new(0.0, 0.0),
         objects: Vec::new(),
         env_objects: Vec::new(),
         state: State::Init,
@@ -84,6 +90,10 @@ fn window_event(_app: &App, model: &mut Model, event: WindowEvent) {
     }
 }
 
+pub fn mouse_moved(_app: &App, model: &mut Model, pos:Point2) {
+    model.mouse_pos = pos;
+}
+
 pub fn update(_app: &App, model: &mut Model, update: Update) {
     if model.state == State::Paused {
         return;
@@ -108,10 +118,10 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
         });
         
         if model.attract {
-            verlet::VerletObject::apply_force_point(&mut model.objects, Vec2::new(0.0, 0.0), Vec2::new(-1.0,-1.0));
+            verlet::VerletObject::apply_force_point(&mut model.objects, model.mouse_pos, -model.direction);
         }
         if model.repel {
-            verlet::VerletObject::apply_force_point(&mut model.objects, Vec2::new(0.0, 0.0), Vec2::new(1.0,1.0));
+            verlet::VerletObject::apply_force_point(&mut model.objects, model.mouse_pos, model.direction);
         }
 
         verlet::VerletObject::check_collisions(&mut model.objects);
