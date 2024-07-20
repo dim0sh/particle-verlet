@@ -90,14 +90,15 @@ impl VerletObject {
         }
     }
 
-    pub fn apply_attract(objects: &mut Vec<VerletObject>, pos:Vec2) {
+    pub fn apply_force_point(objects: &mut Vec<VerletObject>, pos:Vec2, direction:Vec2) {
         let force = Vec2::new(50.0, 50.0);
         for i in 0..objects.len() {
             let axis = Vec2::sub(objects[i].current, pos);
             let dist = Vec2::length(axis);
             let norm = Vec2::normalize(axis);
             let norm = Vec2::mul(norm, dist);
-            objects[i].apply_force(Vec2::mul(force, -norm))
+            let norm = Vec2::mul(norm, direction);
+            objects[i].apply_force(Vec2::mul(force, norm))
         }
     }
 }

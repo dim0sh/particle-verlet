@@ -21,6 +21,7 @@ impl State {
 }
 
 pub struct Model {
+    repel: bool,
     attract: bool,
     pub objects: Vec<verlet::VerletObject>,
     pub env_objects: Vec<verlet::VerletObject>,
@@ -38,6 +39,7 @@ pub fn model(app: &App) -> Model {
     .unwrap();
     
     Model {
+        repel: false,
         attract: false,
         objects: Vec::new(),
         env_objects: Vec::new(),
@@ -73,7 +75,8 @@ fn window_event(_app: &App, model: &mut Model, event: WindowEvent) {
             match key {
                 Key::Space => model.state.invert_pause(),
                 Key::R => model.state = State::Restart,
-                Key::A => model.attract = !model.attract,
+                Key::A => {model.attract = !model.attract;model.repel = false},
+                Key::D => {model.repel = !model.repel;model.attract = false;},
                 _ => (),
             }
         }, 
@@ -105,7 +108,10 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
         });
         
         if model.attract {
-            verlet::VerletObject::apply_attract(&mut model.objects, Vec2::new(0.0, 0.0))
+            verlet::VerletObject::apply_force_point(&mut model.objects, Vec2::new(0.0, 0.0), Vec2::new(-1.0,-1.0));
+        }
+        if model.repel {
+            verlet::VerletObject::apply_force_point(&mut model.objects, Vec2::new(0.0, 0.0), Vec2::new(1.0,1.0));
         }
 
         verlet::VerletObject::check_collisions(&mut model.objects);
