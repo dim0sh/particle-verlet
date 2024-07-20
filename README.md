@@ -5,6 +5,10 @@
     <td>attract</td>
   </tr>
   <tr>
+    <td>D</td>
+    <td>repel</td>
+  </tr>
+  <tr>
     <td>R</td>
     <td>restart</td>
   </tr>
