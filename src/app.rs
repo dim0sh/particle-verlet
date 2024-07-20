@@ -21,6 +21,7 @@ impl State {
 }
 
 pub struct Model {
+    attract: bool,
     pub objects: Vec<verlet::VerletObject>,
     pub env_objects: Vec<verlet::VerletObject>,
     pub state: State,
@@ -37,6 +38,7 @@ pub fn model(app: &App) -> Model {
     .unwrap();
     
     Model {
+        attract: false,
         objects: Vec::new(),
         env_objects: Vec::new(),
         state: State::Init,
@@ -71,6 +73,7 @@ fn window_event(_app: &App, model: &mut Model, event: WindowEvent) {
             match key {
                 Key::Space => model.state.invert_pause(),
                 Key::R => model.state = State::Restart,
+                Key::A => model.attract = !model.attract,
                 _ => (),
             }
         }, 
@@ -101,6 +104,10 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
             object.update(0.1/SUB_TICK as f32);
         });
         
+        if model.attract {
+            verlet::VerletObject::apply_attract(&mut model.objects, Vec2::new(0.0, 0.0))
+        }
+
         verlet::VerletObject::check_collisions(&mut model.objects);
         verlet::VerletObject::check_env_collision(&mut model.objects, &mut model.env_objects);
     }

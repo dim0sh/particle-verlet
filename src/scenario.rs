@@ -19,8 +19,9 @@ pub fn drizzle(model: &mut Model, update: Update) {
 pub fn env_drizzle(model: &mut Model, update: Update) {
     drizzle(model, update);
     if model.state == State::Init {
-        spawn_cup(Vec2::new(0.0, 0.0),&mut model.env_objects, 7, 5.0);
-        spawn_line(Vec2::new(50.0,-20.0),&mut model.env_objects, 7, 5.0);
+        spawn_cup(Vec2::new(0.0, 100.0),&mut model.env_objects, 7, 2.0);
+        spawn_cup(Vec2::new(-50.0, 0.0),&mut model.env_objects, 13, 2.0);
+        spawn_line(Vec2::new(50.0,-50.0),&mut model.env_objects, 7, 2.0);
     }
 }
 
