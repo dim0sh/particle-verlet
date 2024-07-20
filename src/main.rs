@@ -6,7 +6,7 @@ mod scenario;
 use app::model;
 use app::update;
 
-pub const MAX_PARTICLES: usize = 100;
+pub const MAX_PARTICLES: usize = 1000;
 
 pub const WIDTH: f32 = 200.0;
 pub const HEIGHT: f32 = 200.0;
