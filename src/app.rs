@@ -2,10 +2,11 @@ use crate::{scenario, verlet::{self, VerletObject}, GRAVITY, MAX_PARTICLES, SUB_
 use nannou::prelude::*;
 
 #[derive(Debug, PartialEq, Eq)]
-enum State {
+pub enum State {
     Running,
     Paused,
     Restart,
+    Init,
 }
 
 impl State {
@@ -14,29 +15,18 @@ impl State {
             State::Running => *self = State::Paused,
             State::Paused => *self = State::Running,
             State::Restart => {},
+            State::Init => {},
         }
     }
 }
 
 pub struct Model {
-    pub initial: bool,
     pub objects: Vec<verlet::VerletObject>,
     pub env_objects: Vec<verlet::VerletObject>,
-    state: State,
+    pub state: State,
     pub timer: f32,
     pub spawn_switch: f32,
 }
-
-// fn init(n:usize) -> Vec<verlet::VerletObject> {
-//     (0..n).into_iter().map(|i| {
-//         verlet::VerletObject {
-//             current: Vec2::new(200.0 - i as f32 * 3.,200.0),
-//             previous: Vec2::new(200.0, 200.0),
-//             acceleration: Vec2::new(random_range(-2., 2.), random_range(-2., 2.)),
-//             radius: 2.0,
-//         }
-//     }).collect()
-// }
 
 pub fn model(app: &App) -> Model {
     app.new_window()
@@ -47,10 +37,9 @@ pub fn model(app: &App) -> Model {
     .unwrap();
     
     Model {
-        initial: true,
         objects: Vec::new(),
         env_objects: Vec::new(),
-        state: State::Paused,
+        state: State::Init,
         timer: 0.0,
         spawn_switch: 0.0,
     }
@@ -97,9 +86,14 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
         model.objects = Vec::new();
         model.state = State::Paused;
     }
-    // scenario::drizzle(model, update);
+    
     scenario::env_drizzle(model, update);
-    model.initial = false;
+    
+    if model.state == State::Init {
+        model.state = State::Paused;
+    }    
+
+    
     for _ in 0..SUB_TICK {
         model.objects.iter_mut().for_each(|object| {
             object.apply_force(Vec2::new(0.0, GRAVITY));

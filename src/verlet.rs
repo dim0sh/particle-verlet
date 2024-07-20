@@ -1,4 +1,4 @@
-use std::{env, ops::{Add, Mul, Sub}};
+use std::ops::{Add, Mul, Sub};
 
 use nannou::prelude::*;
 

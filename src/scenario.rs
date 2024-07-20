@@ -1,4 +1,4 @@
-use crate::{app::Model, verlet::{self, VerletObject}, MAX_PARTICLES};
+use crate::{app::Model,app::State, verlet::{self, VerletObject}, MAX_PARTICLES};
 use nannou::prelude::*;
 
 pub fn drizzle(model: &mut Model, update: Update) {
@@ -18,7 +18,7 @@ pub fn drizzle(model: &mut Model, update: Update) {
 
 pub fn env_drizzle(model: &mut Model, update: Update) {
     drizzle(model, update);
-    if model.initial {
+    if model.state == State::Init {
         spawn_cup(Vec2::new(0.0, 0.0),&mut model.env_objects, 7, 5.0);
         spawn_line(Vec2::new(50.0,-20.0),&mut model.env_objects, 7, 5.0);
     }
