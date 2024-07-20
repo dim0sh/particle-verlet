@@ -13,6 +13,3 @@
     <td>start/stop</td>
   </tr>
 </table>
-A : attract
-R : restart
-SPACE : start/stop
