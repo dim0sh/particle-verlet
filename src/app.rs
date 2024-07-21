@@ -1,6 +1,5 @@
-use crate::{scenario, verlet::{self, VerletObject}, GRAVITY, MAX_PARTICLES, SUB_TICK};
+use crate::{scenario, verlet,GRAVITY, SUB_TICK};
 use nannou::prelude::*;
-use window::MouseMovedFn;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum State {
