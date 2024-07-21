@@ -12,7 +12,7 @@ pub const WIDTH: f32 = 200.0;
 pub const HEIGHT: f32 = 200.0;
 
 pub const GRAVITY: f32 = -98.1;
-pub const MAX_ACC: f32 = 100.0;
+pub const MAX_ACC: f32 = 150.0;
 
 pub const DAMPING: f32 = 1.1;
 

@@ -1,8 +1,8 @@
-use std::ops::{Add, Mul, Sub};
+use std::{f32::MAX, ops::{Add, Mul, Sub}};
 
 use nannou::prelude::*;
 
-use crate::{DAMPING, HEIGHT, MAX_ACC, WIDTH};
+use crate::{DAMPING, GRAVITY, HEIGHT, MAX_ACC, WIDTH};
 
 pub struct VerletObject {
     pub current: Vec2,
@@ -17,6 +17,9 @@ impl VerletObject {
         self.previous = self.current;
         self.acceleration = Vec2::mul(self.acceleration, dt*dt);
         self.current = Vec2::add(self.current, disp);
+        //
+        self.acceleration = Vec2::new(clamp(self.acceleration.x,-MAX_ACC,MAX_ACC ), clamp(self.acceleration.y, -MAX_ACC, MAX_ACC));
+        //
         self.current = Vec2::add(self.current, self.acceleration);
         self.acceleration = Vec2::ZERO;
 
@@ -24,6 +27,7 @@ impl VerletObject {
     pub fn apply_force(&mut self, force: Vec2) {
         let tmp = Vec2::add(self.acceleration, force);
         self.acceleration = Vec2::new(clamp(tmp.x,-MAX_ACC,MAX_ACC ), clamp(tmp.y, -MAX_ACC, MAX_ACC));
+        // self.acceleration = Vec2::add(self.acceleration, force);
     }
     pub fn check_bounds(&mut self) {
         
@@ -91,7 +95,7 @@ impl VerletObject {
     }
 
     pub fn apply_force_point(objects: &mut Vec<VerletObject>, pos:Vec2, direction:Vec2) {
-        let force = Vec2::new(100.0, 100.0);
+        let force = Vec2::new(50.0, 50.0 - GRAVITY);
         for i in 0..objects.len() {
             let axis = Vec2::sub(objects[i].current, pos);
             let dist = Vec2::length(axis);
