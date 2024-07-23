@@ -2,7 +2,7 @@ use std::ops::{Add, Mul, Sub};
 
 use nannou::prelude::*;
 
-use crate::{grid::Grid, DAMPING, GRAVITY, HEIGHT, MAX_ACC, WIDTH, CELLSIZE};
+use crate::{grid::{self, Grid}, CELLSIZE, DAMPING, GRAVITY, HEIGHT, MAX_ACC, WIDTH};
 
 pub struct VerletObject {
     pub current: Vec2,
@@ -79,15 +79,10 @@ impl VerletObject {
     }
 
     pub fn check_collisions(objects: &mut Vec<VerletObject>, grid: &Grid) {
-        // for i in 0..objects.len() {
-        //     for j in i+1..objects.len() {
-        //         VerletObject::handle_collision(objects, i, j);
-        //     }
-        // }
         for i in 0..objects.len() {
-            if grid.objects[objects[i].get_grid_index()].len() == 0 {
-                break;
-            }
+            // if grid.objects[objects[i].get_grid_index()].len() == 0 {
+            //     break;
+            // }
             for k in objects[i].adjacent_cells().iter() {
                 for j in 0..grid.objects[*k].len() {
                     let jdx = grid.objects[*k][j];
@@ -97,24 +92,21 @@ impl VerletObject {
                     VerletObject::handle_collision(objects,i,jdx);
                 }
             }
-            // for j in 0..grid.objects[objects[i].get_grid_index()].len() {
-            //     // weird check needed due to adjecent cell collision in running application
-            //     if j >= grid.objects[objects[i].get_grid_index()].len() {
-            //         break; 
-            //     }
-            //     let jdx = grid.objects[objects[i].get_grid_index()][j];
-            //     if i == jdx {
-            //         continue;
-            //     }
-            //     VerletObject::handle_collision(objects,i,jdx);
-            // }
         }
     }
 
-    pub fn check_env_collision(objects: &mut Vec<VerletObject>, env_objects: &mut Vec<VerletObject>) {
-        for i in 0..objects.len() {
-            for j in 0.. env_objects.len() {
-                VerletObject::handle_env_collision(objects,env_objects,i,j);
+    pub fn check_env_collision(objects: &mut Vec<VerletObject>, env_objects: &mut Vec<VerletObject>, grid: &Grid) {
+        
+        for env in 0..env_objects.len() {
+            // if grid.objects[env_objects[env].get_grid_index()].len() == 0 {
+            //     println!("{:?}", grid.objects[env_objects[env].get_grid_index()].len());
+            //     break;
+            // }
+            for adjacent_index in env_objects[env].adjacent_cells().iter() {
+                for j in 0..grid.objects[*adjacent_index].len() {
+                    let jdx = grid.objects[*adjacent_index][j];
+                    VerletObject::handle_env_collision(objects,env_objects,jdx,env);
+                }
             }
         }
         

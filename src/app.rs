@@ -62,7 +62,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
     draw.line().start(Point2::new(-WIDTH, HEIGHT)).end(Point2::new(-WIDTH, -HEIGHT)).color(RED);
     draw.line().start(Point2::new(WIDTH, HEIGHT)).end(Point2::new(WIDTH, -HEIGHT)).color(RED);
 
-
+    
     draw.rect().w_h(CELLSIZE, CELLSIZE).color(BLACK);
     model.objects.iter().for_each(|object| {
         draw.ellipse()
@@ -133,6 +133,6 @@ pub fn update(_app: &App, model: &mut Model, update: Update) {
         }
         let grid = grid::Grid::new(&model.objects);
         verlet::VerletObject::check_collisions(&mut model.objects, &grid);
-        verlet::VerletObject::check_env_collision(&mut model.objects, &mut model.env_objects);
+        verlet::VerletObject::check_env_collision(&mut model.objects, &mut model.env_objects, &grid);
     }
 }
