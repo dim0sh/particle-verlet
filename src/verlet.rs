@@ -2,7 +2,7 @@ use std::ops::{Add, Mul, Sub};
 
 use nannou::prelude::*;
 
-use crate::{DAMPING, GRAVITY, HEIGHT, MAX_ACC, WIDTH};
+use crate::{grid::Grid, DAMPING, GRAVITY, HEIGHT, MAX_ACC, WIDTH, CELLSIZE};
 
 pub struct VerletObject {
     pub current: Vec2,
@@ -78,11 +78,36 @@ impl VerletObject {
         }
     }
 
-    pub fn check_collisions(objects: &mut Vec<VerletObject>) {
+    pub fn check_collisions(objects: &mut Vec<VerletObject>, grid: &Grid) {
+        // for i in 0..objects.len() {
+        //     for j in i+1..objects.len() {
+        //         VerletObject::handle_collision(objects, i, j);
+        //     }
+        // }
         for i in 0..objects.len() {
-            for j in i+1..objects.len() {
-                VerletObject::handle_collision(objects, i, j);
+            if grid.objects[objects[i].get_grid_index()].len() == 0 {
+                break;
             }
+            for k in objects[i].adjacent_cells().iter() {
+                for j in 0..grid.objects[*k].len() {
+                    let jdx = grid.objects[*k][j];
+                    if i == jdx {
+                        continue;
+                    }
+                    VerletObject::handle_collision(objects,i,jdx);
+                }
+            }
+            // for j in 0..grid.objects[objects[i].get_grid_index()].len() {
+            //     // weird check needed due to adjecent cell collision in running application
+            //     if j >= grid.objects[objects[i].get_grid_index()].len() {
+            //         break; 
+            //     }
+            //     let jdx = grid.objects[objects[i].get_grid_index()][j];
+            //     if i == jdx {
+            //         continue;
+            //     }
+            //     VerletObject::handle_collision(objects,i,jdx);
+            // }
         }
     }
 
@@ -92,10 +117,14 @@ impl VerletObject {
                 VerletObject::handle_env_collision(objects,env_objects,i,j);
             }
         }
+        
     }
 
     pub fn apply_force_point(objects: &mut Vec<VerletObject>, pos:Vec2, direction:Vec2) {
         let force = Vec2::new(50.0, 50.0 - GRAVITY);
+        if pos.x < -WIDTH || pos.x > WIDTH || pos.y < -HEIGHT || pos.y > HEIGHT {
+            return;
+        }
         for i in 0..objects.len() {
             let axis = Vec2::sub(objects[i].current, pos);
             let dist = Vec2::length(axis);
@@ -104,6 +133,27 @@ impl VerletObject {
             let norm = Vec2::mul(norm, direction);
             objects[i].apply_force(Vec2::mul(force, norm))
         }
+    }
+    pub fn get_grid_index(&self) -> usize {
+        let x = ((self.current.x+WIDTH)/CELLSIZE) as usize;
+        let y = ((self.current.y+HEIGHT)/CELLSIZE) as usize;
+        x + y*CELLSIZE as usize
+    }
+    fn adjacent_cells(&self) -> Vec<usize> {
+        let mut cells = Vec::new();
+        
+        for i in -1..2 {
+            for j in -1..2 {
+                let x = ((self.current.x+WIDTH+(CELLSIZE*i as f32))/CELLSIZE) as usize;
+                let y = ((self.current.y+HEIGHT+(CELLSIZE*j as f32))/CELLSIZE) as usize;
+                let idx = x + y*CELLSIZE as usize;
+                if x >= 0 && x < (WIDTH*2.0) as usize && y >= 0 && y < (HEIGHT*2.0) as usize && !cells.contains(&idx) {
+                    cells.push(idx);
+                }
+            }
+        }
+        
+        cells
     }
 }
     

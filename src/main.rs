@@ -2,14 +2,16 @@ use nannou;
 mod app;
 mod verlet;
 mod scenario;
+mod grid;
 
 use app::model;
 use app::update;
 
-pub const MAX_PARTICLES: usize = 1000;
+pub const MAX_PARTICLES: usize = 10000;
 
 pub const WIDTH: f32 = 200.0;
 pub const HEIGHT: f32 = 200.0;
+pub const CELLSIZE: f32 = 10.0;
 
 pub const GRAVITY: f32 = -98.1;
 pub const MAX_ACC: f32 = 150.0;
